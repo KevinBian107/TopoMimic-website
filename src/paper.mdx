@@ -1,0 +1,76 @@
+---
+title: "Shaped by What's Missing"
+authors:
+  - name: Kaiwen Bian
+    affiliations: ["1", "2"]
+  - name: Eric J. Leonardis
+    affiliations: ["1"]
+  - name: Yuanjia Yang
+    affiliations: ["1", "3"]
+  - name: Charles Zhang
+    affiliations: ["4"]
+  - name: Eiman Azim
+    affiliations: ["3", "6"]
+  - name: "Bence P. \u00D6lveczky"
+    affiliations: ["5"]
+  - name: Yusu Wang
+    affiliations: ["2"]
+  - name: Talmo D. Pereira
+    affiliations: ["1", "3"]
+affiliations:
+  - id: "1"
+    name: "Computational Neurobiology Laboratory, Salk Institute for Biological Studies"
+  - id: "2"
+    name: "Halicio\u011Flu Data Science Institute, UC San Diego"
+  - id: "3"
+    name: "Department of Neurosciences, UC San Diego"
+  - id: "4"
+    name: "Department of Computer Science, Harvard University"
+  - id: "5"
+    name: "Department of Organismic and Evolutionary Biology, Harvard University"
+  - id: "6"
+    name: "Molecular Neurobiology Laboratory, Salk Institute for Biological Studies"
+links:
+  - name: Paper
+    url: "#"
+    icon: ri:file-pdf-2-line
+  - name: Code
+    url: "#"
+    icon: ri:github-line
+theme: light
+favicon: favicon.png
+description: "Topological Invariance Simplification Discovers Behavioral Transitions"
+---
+
+import HighlightedSection from "./components/HighlightedSection.astro";
+
+<HighlightedSection>
+
+<div class="!mt-0 !mb-8">
+  <span class="text-xl sm:text-2xl font-normal text-zinc-700 dark:text-zinc-300 leading-relaxed">
+    Shaped by What's Missing: Topological Invariance Simplification Discovers Behavioral Transitions
+  </span>
+</div>
+
+## Abstract
+
+Understanding how animals transition between behavioral modes is fundamental to neuroscience and motor control. Current approaches either segment behaviors into discrete states or project onto low-dimensional embeddings, but neither explicitly models the geometric structure of transitions themselves. We present a manifold learning method for behavioral transition discovery via topologically invariant simplification. Using discrete Morse theory on density-weighted point clouds, we extract the _topological skeleton_ of the behavioral manifold—a sparse graph that retains only the frames algebraically forced by the data's topology while discarding everything else. The skeleton is shaped by what is _absent_: low-density ridges between behavioral basins create topological obstructions that the simplification must preserve. Our framework operates at two tiers: DM-paths ($H_0$) identify transition corridors between persistent density basins, while DM-cycles ($H_1$) reveal asymmetric motor programs when additional geometric conditions hold. We prove that behavioral transitions force the skeleton to contain saddle-crossing paths, and that drift-invariant representations are necessary for cycle closure. Empirically, behaviorally rich clips retain many skeleton frames at transition points while stationary clips compress to near-zero, validating the weak Morse inequality. The resulting algorithm, Discrete-Morse Wasserstein K-Means Clustering (DM-WKC), uses these topological primitives as manifold coordinates compared via Wasserstein distance to discover transition types without supervision. On rodent and walker datasets across three feature spaces (egocentric keypoints, joint configurations, learned intentions), DM-WKC discovers 2–3× more transition types than state-space baselines with better ground-truth alignment, higher internal consistency, and greater temporal coherence, while the topological primitives act as compressed representations that baseline methods fail to achieve.
+
+</HighlightedSection>
+
+_More content coming soon._
+
+## BibTeX citation
+
+```bibtex
+@article{topomimic2026,
+  title={Shaped by What's Missing: Topological Invariance
+         Simplification Discovers Behavioral Transitions},
+  author={Bian, Kaiwen and Leonardis, Eric J. and Yang, Yuanjia
+          and Zhang, Charles and Azim, Eiman
+          and {\"O}lveczky, Bence P. and Wang, Yusu
+          and Pereira, Talmo D.},
+  journal={arXiv preprint},
+  year={2026}
+}
+```

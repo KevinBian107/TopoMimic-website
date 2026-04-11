@@ -1,0 +1,36 @@
+---
+import type { Author, Affiliation } from "../types/types";
+
+interface Props {
+  authors: Author[];
+  affiliations?: Affiliation[];
+}
+
+const { authors, affiliations } = Astro.props;
+---
+
+<div class="links flex flex-row flex-wrap justify-center gap-x-4 gap-y-2 sm:gap-x-8 sm:gap-y-4">
+  {
+    authors.map((author) => (
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-row text-base sm:text-xl">
+          {author.url ? <a href={author.url}>{author.name}</a> : author.name}
+          {author.affiliations && (
+            <sup class="text-xl">
+              {" "}{author.affiliations.join(",")}
+            </sup>
+          )}
+        </div>
+      </div>
+    ))
+  }
+</div>
+{affiliations && (
+  <div class="text-center text-sm text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto leading-relaxed mt-4">
+    {affiliations.map((aff, index) => (
+      <span>
+        <sup>{aff.id}</sup>{aff.name}{index < affiliations.length - 1 ? "\u2002" : ""}
+      </span>
+    ))}
+  </div>
+)}
