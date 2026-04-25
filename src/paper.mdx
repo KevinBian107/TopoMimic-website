@@ -64,7 +64,9 @@ Behavior, viewed as a dense cloud of poses, has shape — and that shape carries
 
 ### The shape of a familiar manifold
 
-A torus is the textbook example of a space whose shape is more than its bounding box: it has a hole. Our skeleton extraction is built so that, given only a point cloud, that hole is recovered as a primitive of the underlying space rather than inferred from a model.
+A torus is the textbook example of a space whose shape is more than its bounding box: it has a hole. Our skeleton extraction is built so that, given only a point cloud, that hole is recovered as a primitive of the underlying space rather than inferred from a model. The animation walks through the six phases of the construction:
+
+**Point Cloud** → **Greedy Permutation** (sample order from densest to sparsest) → **Vertex Weighting** (assign each point an inverse-density score) → **SWR Filtration Sweep** (grow a sparse weighted Rips graph by adding edges in order of weight) → **DM Skeleton** (collapse paired simplices via the discrete Morse matching, keep only the critical ones) → **Cycle Detection (H₁)** (the surviving unfilled loops are the topological obstructions — the hole of the torus shows up here).
 
 <figure class="my-6">
   <video src="/TopoMimic-website/figures/torus_dm_demo.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-3xl mx-auto rounded-md shadow-sm" />
