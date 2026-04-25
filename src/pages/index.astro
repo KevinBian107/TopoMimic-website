@@ -81,7 +81,18 @@ const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
         {links && <Links links={links} />}
       </div>
     </header>
-    <TableOfContents headings={headings} />
+    <TableOfContents
+      headings={headings}
+      labels={{
+        "abstract": "Abstract",
+        "a-look-at-what-the-method-sees": "Method",
+        "the-shape-of-a-familiar-manifold": "Manifold",
+        "the-shape-of-a-behavior-landscape": "Landscape",
+        "the-shape-of-a-transition": "Transition",
+        "recovering-transitions-from-shape-alone": "Recovery",
+        "bibtex-citation": "BibTeX",
+      }}
+    />
     <main>
       <Content components={{ table: Table }} />
     </main>
