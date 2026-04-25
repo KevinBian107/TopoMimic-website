@@ -38,10 +38,12 @@ const items = (headings ?? []).filter((h) => depths.includes(h.depth));
   .toc-nav {
     position: fixed;
     top: 50%;
-    left: 1.5rem;
+    /* Anchor the TOC just to the LEFT of the centered content column
+       (text column is max-width 56rem). Width = 12rem, gap to column = 1.5rem. */
+    left: calc(50vw - 28rem - 12rem - 1.5rem);
     transform: translateY(-50%);
     z-index: 40;
-    max-width: 12rem;
+    width: 12rem;
     opacity: 0;
     transition: opacity 0.25s ease;
     pointer-events: none;
