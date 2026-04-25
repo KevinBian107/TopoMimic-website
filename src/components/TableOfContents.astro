@@ -1,0 +1,74 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+  /** Heading depths to include (default: [2, 3]). */
+  depths?: number[];
+}
+
+const { headings, depths = [2, 3] } = Astro.props;
+const items = (headings ?? []).filter((h) => depths.includes(h.depth));
+---
+
+<aside
+  class="toc hidden xl:block fixed top-24 left-6 w-56 z-40 text-sm
+         text-zinc-600 dark:text-zinc-400"
+  aria-label="Table of contents"
+>
+  <div class="font-medium uppercase tracking-wider text-xs text-zinc-500 mb-3">
+    Contents
+  </div>
+  <nav>
+    <ul class="space-y-1.5 list-none p-0 m-0">
+      {items.map((h) => (
+        <li class={h.depth === 3 ? "pl-4" : ""}>
+          <a
+            href={"#" + h.slug}
+            data-toc-target={h.slug}
+            class="block leading-snug text-zinc-600 dark:text-zinc-400
+                   hover:text-blue-600 dark:hover:text-blue-300
+                   border-l-2 border-transparent pl-2 -ml-px transition-colors"
+          >
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</aside>
+
+<script is:inline>
+  // Highlight the TOC entry whose section is currently in view.
+  (function () {
+    const links = Array.from(document.querySelectorAll("[data-toc-target]"));
+    if (!links.length) return;
+    const targets = links
+      .map((a) => document.getElementById(a.getAttribute("data-toc-target")))
+      .filter(Boolean);
+    const setActive = (slug) => {
+      links.forEach((a) => {
+        const on = a.getAttribute("data-toc-target") === slug;
+        a.classList.toggle("text-blue-600", on);
+        a.classList.toggle("dark:text-blue-300", on);
+        a.classList.toggle("border-blue-600", on);
+        a.classList.toggle("dark:border-blue-300", on);
+        a.classList.toggle("font-medium", on);
+      });
+    };
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 },
+    );
+    targets.forEach((t) => obs.observe(t));
+  })();
+</script>
