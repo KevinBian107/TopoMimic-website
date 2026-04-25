@@ -54,11 +54,65 @@ import HighlightedSection from "./components/HighlightedSection.astro";
 
 ## Abstract
 
-Understanding how animals transition between behavioral modes is central to neuro-ethology, yet existing tools describe these transitions only at macro resolution. Approaches using state-space models such as [Weinreb et al., 2024] summarize transitions in a matrix over discrete syllables after coarsening each trajectory into states. Topological approaches such as Mapper [Singh et al., 2007] summarize transitions as edges in a cluster graph after coarsening the manifold into overlapping patches. In both cases the coarsening step happens first, and the resolution of any transition claim inherits from that coarsening. We take the opposite route and recover transition structure directly from the raw trajectory, at the fidelity of individual frames. Using discrete Morse theory on density-weighted point clouds, we extract two topological primitives (DM-primitives) on the behavioral manifold: DM-paths ($H_0$), which thread through the sparse regions between behavioral basins, and DM-cycles ($H_1$), which encode asymmetric forward and return motor programs when geometric conditions hold. We prove that behavioral transitions force these primitives to exist in the skeleton, making their presence a guarantee rather than a heuristic. On a rat behavior dataset across three representations (egocentric keypoints, joint configurations, learned intentions), unsupervised Wasserstein clustering of the primitives (DM-WKC) recovers transitions that state-space baselines (AR-HMM, VAE, KPMS) and a Mapper topological-clustering baseline miss, at a fidelity coarsening-based methods structurally cannot reach. DM-primitives provide a complementary feature space whose transition information the existing camps leave on the table.
+Understanding how animals transition between behavioral modes is central to neuro-ethology, yet existing tools describe these transitions only at macro resolution. AR-HMM-based segmenters such as Keypoint-MoSeq [Weinreb et al., 2024] summarize transitions in a matrix over discrete syllables after coarsening each trajectory into states; deep autoencoder-based segmenters (VAME, [Luxem et al., 2022]) and topological tools such as Mapper [Singh et al., 2007] also coarsen first, then read transitions off the coarsened object. In every case the resolution of any transition claim inherits from that coarsening. We take the opposite route and recover transition structure directly from the raw trajectory, at the fidelity of individual frames. Using discrete Morse theory on density-weighted point clouds, we extract two topological primitives (DM-primitives) on the behavioral manifold: DM-paths ($H_0$), which thread through the sparse regions between behavioral basins, and DM-cycles ($H_1$), which encode asymmetric forward and return motor programs when geometric conditions hold. We prove that behavioral transitions force these primitives to exist in the skeleton, making their presence a guarantee rather than a heuristic. On a rat behavior dataset across three representations (egocentric keypoints, joint configurations, learned intentions), unsupervised Wasserstein clustering of the primitives (DM-WKC) recovers transitions that the AR-HMM, deep-autoencoder, and Mapper baselines miss, at a fidelity coarsening-based methods structurally cannot reach. DM-primitives provide a complementary feature space whose transition information the existing camps leave on the table.
 
 </HighlightedSection>
 
-_More content coming soon._
+## A look at what the method sees
+
+Behavior, viewed as a dense cloud of poses, has shape — and that shape carries the transitions. The clips below are intentionally minimal: no equations, no labels, just the raw geometric objects our method works with. Hover over each to see them play.
+
+### The shape of a familiar manifold
+
+A torus is the textbook example of a space whose shape is more than its bounding box: it has a hole. Our skeleton extraction is built so that, given only a point cloud, that hole is recovered as a primitive of the underlying space rather than inferred from a model.
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/torus_dm_demo.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-3xl mx-auto rounded-md shadow-sm" />
+</figure>
+
+### The shape of a behavior landscape
+
+Real animal behavior is messier than a torus, but the same idea applies. Pose density forms basins (where behavior settles) and ridges (where it crosses). The skeleton our method extracts traces only the structure that the density forces — peaks, valleys, the saddles between them.
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/dmpc_demo.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-4xl mx-auto rounded-md shadow-sm" />
+  <figcaption class="text-center text-sm text-zinc-500 mt-2">A two-basin landscape (left), the cycle and path the skeleton extracts (middle), and the top-down density map (right).</figcaption>
+</figure>
+
+### The shape of a transition
+
+When two density basins are kept apart by a low-density ridge, the corridor that bridges them — and the loop that closes around them when the forward and return paths are geometrically distinct — is precisely what the method picks out. Below, two such routes recovered on a single rodent clip, with the rendered pose at each waypoint.
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/paths.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-4xl mx-auto rounded-md shadow-sm" />
+  <figcaption class="text-center text-sm text-zinc-500 mt-2">Two routes between behavioral modes, with the rodent pose along each route.</figcaption>
+</figure>
+
+### Recovering transitions from shape alone
+
+A surprising property of the method is how little temporal information it needs. The skeleton is built from the *spatial* density of poses — what configurations the body actually visits, and how often — without explicit Markov dynamics, sequence models, or labels. From that alone, the same behavior pair the human annotator labelled (left two columns of each video) can be reconstructed end-to-end (right two columns), one example each from the DM-cycle (DMC) and DM-path (DMP) primitives. We omit the transitions that the method did not find.
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/gtvd/Immobile_Rear.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-5xl mx-auto rounded-md shadow-sm" />
+  <figcaption class="text-center text-sm text-zinc-500 mt-2">Immobile ↔ Rear. Left two: ground truth. Right two: DMC and DMP discovered.</figcaption>
+</figure>
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/gtvd/Immobile_Turn.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-5xl mx-auto rounded-md shadow-sm" />
+  <figcaption class="text-center text-sm text-zinc-500 mt-2">Immobile ↔ Turn. Left two: ground truth. Right two: DMC and DMP discovered.</figcaption>
+</figure>
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/gtvd/Immobile_Walk.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-5xl mx-auto rounded-md shadow-sm" />
+  <figcaption class="text-center text-sm text-zinc-500 mt-2">Immobile ↔ Walk. Left two: ground truth. Right two: DMC and DMP discovered.</figcaption>
+</figure>
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/gtvd/Rear_Turn.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-5xl mx-auto rounded-md shadow-sm" />
+  <figcaption class="text-center text-sm text-zinc-500 mt-2">Rear ↔ Turn. Left two: ground truth. Right two: DMC and DMP discovered.</figcaption>
+</figure>
+
+_Full method, theorems, and benchmarks in the paper. More content coming soon._
 
 ## BibTeX citation
 
