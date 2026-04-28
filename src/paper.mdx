@@ -90,9 +90,7 @@ When two density basins are kept apart by a low-density ridge, the corridor that
   <figcaption class="text-center text-sm text-zinc-500 mt-2">Two routes between behavioral modes, with the rodent pose along each route.</figcaption>
 </figure>
 
-### One clip, every transition
-
-Zooming all the way in: a single rodent clip rich enough to span four distinct behaviors (Immobile, Walking, Left Turn, Rear). Following the same logic the paper uses, we keep one cluster minimum per behavior label and connect every minimum pair with its DM-path. The left panel is a t-SNE of the clip's intention features, where each frame is colored by its behavior and a star marks each cluster's inverse-density minimum. As the video plays, every DM-path on the t-SNE grows simultaneously, and each segment of the line is colored by the cluster the point underneath it belongs to — so the line itself reads as a behavior-to-behavior gradient. The rows on the right play the rodent traversing each path in real time; the body's tint shifts continuously from the source cluster's color to the destination cluster's color, the same gradient idea applied to the actual movement.
+Zooming out from a single transition to a single clip: rich enough to span four distinct behaviors (Immobile, Walking, Left Turn, Rear), one cluster minimum per behavior label, and a DM-path between every minimum pair. The left panel is a t-SNE of the clip's intention features, points colored by behavior and a star at each cluster's inverse-density minimum; as the video plays, every DM-path on the t-SNE grows simultaneously, with each line segment taking the cluster color of the point underneath, so the line itself reads as a behavior-to-behavior gradient. The rows on the right play the rodent traversing each path in real time, with the body's tint shifting continuously from the source cluster's color to the destination cluster's color — the same gradient idea applied to the actual movement.
 
 <figure class="my-6">
   <video src="/TopoMimic-website/figures/oneclip_transitions.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-5xl mx-auto rounded-md shadow-sm" />
