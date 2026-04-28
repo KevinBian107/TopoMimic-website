@@ -90,6 +90,15 @@ When two density basins are kept apart by a low-density ridge, the corridor that
   <figcaption class="text-center text-sm text-zinc-500 mt-2">Two routes between behavioral modes, with the rodent pose along each route.</figcaption>
 </figure>
 
+### One clip, every transition
+
+Zooming all the way in: a single rodent clip rich enough to span four distinct behaviors (Immobile, Walking, Left Turn, Rear). Following the same logic the paper uses, we keep one cluster minimum per behavior label and connect every minimum pair with its DM-path. The left panel is a t-SNE of the clip's intention features, where each frame is colored by its behavior and a star marks each cluster's inverse-density minimum. As the video plays, every DM-path on the t-SNE grows simultaneously, and each segment of the line is colored by the cluster the point underneath it belongs to — so the line itself reads as a behavior-to-behavior gradient. The rows on the right play the rodent traversing each path in real time; the body's tint shifts continuously from the source cluster's color to the destination cluster's color, the same gradient idea applied to the actual movement.
+
+<figure class="my-6">
+  <video src="/TopoMimic-website/figures/oneclip_transitions.mp4" autoplay loop muted playsinline preload="metadata" class="w-full max-w-5xl mx-auto rounded-md shadow-sm" />
+  <figcaption class="text-center text-sm text-zinc-500 mt-2">A single clip, four cluster minima, six DM-paths. Left: t-SNE with cluster minima (stars) and DM-paths growing in cluster-colored segments. Right: the rodent traversing each path, body tinted source-cluster → destination-cluster.</figcaption>
+</figure>
+
 ### Recovering transitions from shape alone
 
 A surprising property of the method is how little temporal information it needs. The skeleton is built from the *spatial* density of poses — what configurations the body actually visits, and how often — without explicit Markov dynamics, sequence models, or labels. From that alone, the same behavior pair the human annotator labelled (left two columns of each video) can be reconstructed end-to-end (right two columns), one example each from the DM-cycle (DMC) and DM-path (DMP) primitives. We omit the transitions that the method did not find.
