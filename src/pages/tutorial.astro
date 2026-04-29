@@ -1,0 +1,408 @@
+---
+import { Font } from "astro:assets";
+
+import "../styles/global.css";
+
+const baseUrl = import.meta.env.BASE_URL;
+const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+
+const title = "PCD (Point Cloud Discrete-Morse) walkthrough";
+const description =
+  "A stage-by-stage walkthrough of the Point Cloud Discrete-Morse (PCD) pipeline used in TopoVNL, illustrated on a 3D figure-eight cloud.";
+---
+
+<!doctype html>
+<html class="bg-white dark:bg-zinc-900" lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="icon" type="image/png" href={prefix + "favicon.png"} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    <Font
+      cssVariable="--font-noto-sans"
+      preload={[{ subset: "latin", style: "normal" }]}
+    />
+
+    <title>{title}</title>
+  </head>
+  <body
+    class="prose prose-lg prose-zinc dark:prose-invert prose-a:text-blue-500 prose-a:dark:text-blue-300 prose-a:no-underline prose-a:hover:underline prose-a:font-normal prose-code:bg-zinc-200 prose-code:dark:bg-zinc-800 prose-code:text-zinc-800 prose-code:dark:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none max-w-none pt-16 pb-6 font-(family-name:--font-noto-sans)"
+  >
+    <header class="mx-auto mb-12 max-w-[56rem] px-6 text-center">
+      <h1 class="text-4xl font-medium sm:text-5xl">{title}</h1>
+      <p class="mt-2 text-base font-medium tracking-wide text-zinc-700 uppercase dark:text-zinc-300">
+        TopoMimic
+      </p>
+      <p class="mt-4 text-zinc-600 dark:text-zinc-400">
+        A guided tour of the Point Cloud Discrete-Morse (PCD) pipeline used by
+        TopoMimic.
+      </p>
+      <div class="not-prose mx-auto mt-6 max-w-2xl rounded-md border border-zinc-200 bg-zinc-50 p-4 text-left text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+        <p class="m-0">
+          <strong>Credit.</strong> All algorithmic ideas in this walkthrough —
+          the sparse weighted Rips construction, density-weighted edge births,
+          and discrete-Morse cancellation on point clouds — come from{" "}
+          <a
+            href="https://arxiv.org/abs/2109.07606"
+            class="text-blue-600 hover:underline dark:text-blue-400"
+            target="_blank"
+            rel="noopener">arXiv:2109.07606</a
+          >. The C++ implementation is{" "}
+          <a
+            href="https://github.com/lucasjmagee/PCD-Graph-Recon-DM"
+            class="text-blue-600 hover:underline dark:text-blue-400"
+            target="_blank"
+            rel="noopener">PCD-Graph-Recon-DM</a
+          >, which TopoMimic wraps. <em>This page is only a visual walkthrough
+          — refer to the paper for proofs, theoretical guarantees, and formal
+          definitions.</em>
+        </p>
+      </div>
+      <div class="not-prose mt-6 flex justify-center">
+        <a
+          href={prefix}
+          class="flex flex-row items-center gap-2 rounded-full bg-zinc-800 px-5 py-2 text-base text-white hover:bg-black hover:no-underline dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-50"
+        >
+          ← Back to paper
+        </a>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-[56rem] px-6">
+      <p>
+        We work with a synthetic 3D figure-eight throughout: two loops joined
+        at a single saddle, ~600 points, dense on the lobes and sparse near
+        the crossing. The shape exercises every part of the pipeline — two
+        H<sub>1</sub> classes (one per loop), several H<sub>0</sub> basins,
+        a real geometric saddle, and heterogeneous sampling density. Simpler
+        shapes drop at least one of these ingredients (a torus has only one
+        H<sub>1</sub> class, two Gaussian basins have no H<sub>1</sub> at
+        all, a single annulus has no saddle), which is why we picked this
+        one.
+      </p>
+
+      <h2>Reading the cloud's local sampling scale</h2>
+      <p>
+        The very first thing the algorithm does is line the points up in a
+        <em> farthest-point permutation</em>: at each step pick the point that
+        maximises the minimum distance to the prefix already chosen. The
+        distance to the <em>nearest</em> point in the prefix at the moment a
+        new point is added is its <strong>intersection radius</strong>{" "}
+        λ<sub>i</sub> — a per-vertex local sampling scale. Small λ means
+        crowded neighbourhood; large λ means sparse or outlier.
+      </p>
+      <p>
+        On the figure-eight you can watch the algorithm visibly hop between
+        the two lobes as the prefix grows, and the resulting λ-coloured cloud
+        shows the dense-on-lobes / sparse-near-the-crossing pattern that all
+        downstream stages will key off:
+      </p>
+      <div class="not-prose my-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <figure class="m-0 flex flex-col">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+            <video
+              src={prefix + "figures/dm_walkthrough/02_greedy_permutation.mp4"}
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="metadata"
+              class="h-full w-full object-contain"></video>
+          </div>
+          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+            Farthest-point insertion order — the algorithm visibly hops
+            between the two lobes as the prefix grows. Colour bar = step
+            number from 0 to N.
+          </figcaption>
+        </figure>
+        <figure class="m-0 flex flex-col">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+            <img
+              src={prefix + "figures/dm_walkthrough/03_intersection_radii.png"}
+              alt="intersection radii"
+              class="h-full w-full object-contain"
+            />
+          </div>
+          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+            Cloud coloured by λ<sub>i</sub>. Yellow = small (dense
+            neighbourhood); dark purple = large (sparse / outlier).
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2>Throwing away most candidate edges</h2>
+      <p>
+        With a per-vertex sampling scale in hand, the next move is to decide
+        which edges of the complete graph on the cloud are even worth keeping.
+        A naive Rips construction at scale α admits every edge with{" "}
+        <em>d(p,q) ≤ 2α</em> — O(N²) of them, most of which are redundant in
+        the sense that they thicken already-dense regions without adding
+        anything topologically new. The ε-sparsifier admits only edges whose
+        scale α fits the per-vertex perturbation bands set by λ<sub>p</sub>,
+        λ<sub>q</sub>, ε; edges that exceed{" "}
+        <code>min(λ<sub>p</sub>, λ<sub>q</sub>) / [ε(1−ε)]</code>{" "}
+        get dropped entirely. Sheehy (2013) shows the resulting filtration's
+        persistence diagram is within (1+ε) of the full Rips' diagram, so the
+        savings are essentially free.
+      </p>
+      <p>
+        Sweeping ε from aggressive (0.5) up to lenient (0.99), you can watch
+        the sparsifier loosen its grip — at small ε most edges are pruned, at
+        ε near 1 most survive:
+      </p>
+      <figure class="my-6">
+        <video
+          src={prefix + "figures/dm_walkthrough/04_sparsifier_eps_sweep.mp4"}
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          class="mx-auto w-full max-w-2xl rounded-md shadow-sm"></video>
+        <figcaption class="text-center text-sm text-zinc-500">
+          Sweeping ε from 0.5 to 0.99: at small ε the sparsifier is aggressive
+          (few edges admitted); at ε near 1 most edges survive. The edge count
+          appears in the title.
+        </figcaption>
+      </figure>
+
+      <h2>Turning density into a height function</h2>
+      <p>
+        The surviving vertices and edges now need filtration values — the
+        scale α at which each will enter the simplicial complex. Every
+        surviving vertex gets an inverse-density weight{" "}
+        <code>w(v) = √( (1/k) Σ d(v, kNN<sub>j</sub>)² )</code>: the
+        root-mean-square distance to its k nearest neighbours. Dense
+        neighbourhood gives small w, sparse neighbourhood gives large w. We
+        treat this number as the vertex's filtration value α(v) = w(v),
+        which means dense vertices enter the filtration first — the{" "}
+        <strong>densest-first</strong> rule.
+      </p>
+      <p>
+        Painted on the figure-eight, this is the inverse-density landscape
+        the rest of the pipeline will sweep through: the lobes (dense) sit
+        low, the crossing region (sparse) sticks up:
+      </p>
+      <figure class="my-6">
+        <img
+          src={prefix + "figures/dm_walkthrough/05_rms_knn_weights.png"}
+          alt="RMS k-NN weights"
+          class="mx-auto max-w-2xl rounded-md shadow-sm"
+        />
+        <figcaption class="text-center text-sm text-zinc-500">
+          The cloud coloured by w(v). Lobes (dense) are dark; the crossing
+          region (sparse) is bright — the inverse-density landscape that the
+          rest of the pipeline sweeps over.
+        </figcaption>
+      </figure>
+      <p>
+        Edges and triangles inherit their α from the same density picture.
+        Imagine each vertex as a "bubble" of radius w(v); as a single global
+        scale α grows, each bubble inflates to radius{" "}
+        <code>√(α² − w(v)²)</code>. An edge is born the moment its two
+        endpoints' bubbles just touch. A triangle is born at the α of its
+        last-born edge.
+      </p>
+      <p>
+        In one line: <em>α(e) is the time on the α-clock at which edge e
+        joins the simplicial complex (which is when the "touch" happens).</em>
+        Concretely:
+      </p>
+      <div class="not-prose my-6 rounded-md border border-zinc-200 bg-zinc-50 px-6 py-5 dark:border-zinc-700 dark:bg-zinc-800">
+        <div class="space-y-4 font-serif text-base text-zinc-800 dark:text-zinc-100">
+          <div class="flex items-baseline gap-3">
+            <span class="w-24 shrink-0 text-right italic text-zinc-500">vertex</span>
+            <span>
+              α(v<sub>i</sub>) = w(v<sub>i</sub>) = √( (1/k) Σ<sub>j ∈ kNN(v<sub>i</sub>)</sub> d(v<sub>i</sub>, v<sub>j</sub>)² )
+            </span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="w-24 shrink-0 text-right italic text-zinc-500">edge</span>
+            <span>
+              α(e<sub>ij</sub>) = max{"("}
+              √( d⁴ + w<sub>i</sub>⁴ + w<sub>j</sub>⁴ + 2d²(w<sub>i</sub>² + w<sub>j</sub>²) − 2 w<sub>i</sub>² w<sub>j</sub>² ) / (2d),  w<sub>i</sub>,  w<sub>j</sub>
+              {")"}
+            </span>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <span class="w-24 shrink-0 text-right italic text-zinc-500">triangle</span>
+            <span>
+              α(t) = max{"{"} α(e) : e ∈ ∂t {"}"}
+            </span>
+          </div>
+        </div>
+        <p class="mt-4 mb-0 text-sm text-zinc-500">
+          where d = d(v<sub>i</sub>, v<sub>j</sub>) is the metric distance.
+          The vertex weight w(v) is the RMS distance to v's k nearest
+          neighbours. The edge formula is the closed form for "two
+          density-inflated balls just touch", with a clamp ensuring α(e) is
+          never smaller than either endpoint's α. A triangle is born at the
+          α of its latest-born edge — equivalently, when its third edge
+          enters the complex.
+        </p>
+      </div>
+      <p>
+        <strong>Milestone — the SWR 1-skeleton is fully formed here.</strong>{" "}
+        Every surviving edge has its α(e), every triangle has its α(t), and
+        the simplicial complex is a single sorted-by-α event log on disk.
+        Everything after this section <em>reads</em> that log; nothing after
+        this section adds new simplices to it.
+      </p>
+
+      <h2>Replaying the growth as a persistence diagram</h2>
+      <p>
+        Run the growth on the figure-eight and you get a continuous sweep
+        that vacuums up the cloud bottom-first — basins fill long before
+        ridges, and the loops only close at the very end when the triangles
+        supporting them finally appear. The persistence step{" "}
+        <em>replays</em> that log and bookkeeps births and deaths: vertices
+        create new connected components, edges merge components (a younger
+        component dies into an older one), and triangles fill loops. Each
+        merge or fill becomes one <em>persistence pair</em> with a measurable
+        lifetime <em>death − birth</em>. On the figure-eight you can see two
+        stand-out H<sub>1</sub> pairs in the resulting diagram (the two
+        lobes), several H<sub>0</sub> pairs (the basins), and a cluster of
+        short pairs near the diagonal that are clearly noise — and crucially
+        this stage does no thresholding, so every feature, however trivial,
+        is in the diagram:
+      </p>
+      <div class="not-prose my-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <figure class="m-0 flex flex-col">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+            <video
+              src={prefix + "figures/dm_walkthrough/06_filtration_alpha_sweep.mp4"}
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="metadata"
+              class="h-full w-full object-contain"></video>
+          </div>
+          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+            α grows from 0 to ∞: vertices appear in ascending w (dense lobes
+            first), edges connect in ascending α, triangles fill the loops as
+            their third edge enters.
+          </figcaption>
+        </figure>
+        <figure class="m-0 flex flex-col">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+            <img
+              src={prefix + "figures/dm_walkthrough/07_persistence_diagram.png"}
+              alt="persistence diagram"
+              class="h-full w-full object-contain"
+            />
+          </div>
+          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+            The diagram. Two long-persistence H<sub>1</sub> pairs = two lobes;
+            the noise cluster sits near the diagonal. δ (red dashed line) is
+            the cancellation threshold the next section applies.
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2>Cancelling noise and tracing the skeleton</h2>
+      <p>
+        Only at the very last step does the persistence threshold δ enter the
+        picture. The Forman cancellation rule says: every persistence pair
+        with <em>lifetime ≤ δ</em> is treated as noise (the birth and death
+        simplices are matched and erased); every pair with{" "}
+        <em>lifetime &gt; δ</em> survives as <em>critical</em>. The algorithm
+        then walks descending gradient flows between surviving critical
+        1-simplices (saddles) and critical 0-simplices (basin minima), and
+        writes those traced flows as the edges of the discrete-Morse skeleton{" "}
+        G<sub>M</sub>.
+      </p>
+      <p>
+        Sweeping δ on the figure-eight makes this concrete. At small δ the
+        skeleton is dense and noisy; as δ grows, noise pairs cancel first,
+        then shallower basins, until eventually only the most persistent
+        loop survives:
+      </p>
+      <div class="not-prose my-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <figure class="m-0 flex flex-col">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+            <video
+              src={prefix + "figures/dm_walkthrough/08_delta_cancellation.mp4"}
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="metadata"
+              class="h-full w-full object-contain"></video>
+          </div>
+          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+            Sweeping δ upward: noise pairs cancel first, then shallower
+            basins, then eventually one of the H<sub>1</sub> classes —
+            G<sub>M</sub>'s edge count appears in the title.
+          </figcaption>
+        </figure>
+        <figure class="m-0 flex flex-col">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+            <video
+              src={prefix + "figures/dm_walkthrough/09_v_path_tracing.mp4"}
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="metadata"
+              class="h-full w-full object-contain"></video>
+          </div>
+          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+            Descending V-paths drawn step-by-step. Stars are the two most
+            persistent basin minima; the coloured edges are two edge-disjoint
+            V-paths between them, traced one edge at a time through the
+            Forman matching.
+          </figcaption>
+        </figure>
+      </div>
+      <p>
+        <strong>Milestone — the discrete-Morse skeleton G<sub>M</sub> is
+        fully formed here.</strong>{" "}
+        It is a strict subgraph of the SWR 1-skeleton: only the edges along
+        the traced descending V-paths between surviving critical simplices
+        survive. From this point on, TopoMimic analyses G<sub>M</sub>
+        directly — extracting fundamental cycles (DM-cycles, H<sub>1</sub>)
+        and edge-disjoint paths between persistent minima (DM-paths,
+        H<sub>0</sub>).
+      </p>
+
+      <h2>Three things easy to confuse</h2>
+      <ul>
+        <li>
+          <strong>SWR 1-skeleton ≠ discrete-Morse skeleton.</strong> The former
+          is the full ε-sparsified Rips edge set (thousands of edges), the
+          substrate the topology engine operates on. The latter is its
+          post-cancellation V-path-traced subgraph (dozens of edges) and is
+          what TopoVNL analyses.
+        </li>
+        <li>
+          <strong>The PCD path is not a lower-star filtration.</strong>
+          Lower-star is the <em>baseline</em> branch of the dmpcd library
+          (Gaussian KDE on a fixed-radius Rips, with simplex α =
+          max(f(vertices))). The PCD branch uses the closed-form weighted-Rips
+          birth from Stage 3 — different filtration rule, different persistence
+          binary.
+        </li>
+        <li>
+          <strong>δ is read only by the last binary.</strong> Persistence is
+          δ-agnostic. You can sweep δ post-hoc with the same persistence
+          diagram — no need to recompute the filtration or the persistence.
+        </li>
+      </ul>
+
+    </main>
+
+    <footer class="mx-auto mt-12 max-w-[56rem] px-6 text-center">
+      <p class="prose-sm text-center">
+        Tutorial companion to <a href={prefix}>Shaped by What's Missing</a>.
+      </p>
+    </footer>
+  </body>
+</html>
