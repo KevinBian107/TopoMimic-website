@@ -18,13 +18,15 @@
   width: 100%;
 }
 
+
+
 html {
   /* Enables container query units (e.g., 100cqw) for layout calculations in main. */
   container-type: inline-size;
 }
 
 :root {
-  --maximum-text-width: 56rem;
+  --maximum-text-width: 61rem;
   --minimum-inline-margin: 1.5rem;
   --actual-inline-margin: max(
     var(--minimum-inline-margin),
@@ -50,6 +52,91 @@ main .katex-display {
   padding-inline: 1.5rem;
   width: max-content;
   margin-inline: auto;
+}
+
+/* NeurIPS-style tables */
+.neurips-table {
+  border-collapse: collapse;
+  font-size: 0.5rem;
+  width: 100%;
+  max-width: 50rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.neurips-table thead th {
+  font-weight: 700;
+  padding: 0.15rem 0.1rem;
+  border-top: 2px solid #222;
+  border-bottom: 1px solid #222;
+  white-space: nowrap;
+}
+.neurips-table thead th:first-child {
+  width: 18%;
+}
+.neurips-table thead th[colspan] {
+  border-bottom: none;
+  padding-bottom: 0.1rem;
+}
+.neurips-table thead tr.sub-header th {
+  border-top: none;
+  border-bottom: 1px solid #222;
+  font-weight: 600;
+  font-size: 0.45rem;
+}
+.neurips-table .group-separator {
+  border-left: 2px solid #ccc;
+}
+
+.neurips-table tbody td {
+  padding: 0.1rem 0.1rem;
+  white-space: nowrap;
+}
+.neurips-table tbody td:first-child,
+.neurips-table thead th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.neurips-table tbody tr.midrule td {
+  border-top: 1px solid #999;
+}
+.neurips-table tbody tr:last-child td {
+  border-bottom: 2px solid #222;
+}
+.neurips-table .best {
+  font-weight: 700;
+}
+.neurips-table .second {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.neurips-table caption {
+  caption-side: top;
+  text-align: left;
+  font-size: 0.65rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+.neurips-table caption strong {
+  font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .neurips-table {
+    font-size: 0.85rem;
+    table-layout: fixed;
+  }
+  .neurips-table thead th {
+    padding: 0.5rem 0.5rem;
+  }
+  .neurips-table thead tr.sub-header th {
+    font-size: 0.8rem;
+  }
+  .neurips-table tbody td {
+    padding: 0.3rem 0.5rem;
+  }
+  .neurips-table caption {
+    font-size: 0.9rem;
+  }
 }
 
 /* Bibliography */
