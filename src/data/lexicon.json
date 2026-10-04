@@ -1,0 +1,158 @@
+[
+ {
+  "from": "Turn",
+  "to": "Immobile",
+  "n": 669,
+  "clip": 792,
+  "frames": [
+   215,
+   295
+  ],
+  "turn": "RIGHT",
+  "src": "media/lexicon/00_turn_immobile.mp4",
+  "poster": "media/lexicon/00_turn_immobile.jpg"
+ },
+ {
+  "from": "Immobile",
+  "to": "Turn",
+  "n": 605,
+  "clip": 739,
+  "frames": [
+   140,
+   200
+  ],
+  "turn": "RIGHT",
+  "src": "media/lexicon/01_immobile_turn.mp4",
+  "poster": "media/lexicon/01_immobile_turn.jpg"
+ },
+ {
+  "from": "Immobile",
+  "to": "Rear",
+  "n": 155,
+  "clip": 217,
+  "frames": [
+   166,
+   246
+  ],
+  "turn": "STRAIGHT",
+  "src": "media/lexicon/02_immobile_rear.mp4",
+  "poster": "media/lexicon/02_immobile_rear.jpg"
+ },
+ {
+  "from": "Rear",
+  "to": "Immobile",
+  "n": 153,
+  "clip": 625,
+  "frames": [
+   49,
+   129
+  ],
+  "turn": "STRAIGHT",
+  "src": "media/lexicon/03_rear_immobile.mp4",
+  "poster": "media/lexicon/03_rear_immobile.jpg"
+ },
+ {
+  "from": "Rear",
+  "to": "Turn",
+  "n": 151,
+  "clip": 220,
+  "frames": [
+   150,
+   206
+  ],
+  "turn": "LEFT",
+  "src": "media/lexicon/04_rear_turn.mp4",
+  "poster": "media/lexicon/04_rear_turn.jpg"
+ },
+ {
+  "from": "Turn",
+  "to": "Walk",
+  "n": 113,
+  "clip": 597,
+  "frames": [
+   197,
+   253
+  ],
+  "turn": "LEFT",
+  "src": "media/lexicon/05_turn_walk.mp4",
+  "poster": "media/lexicon/05_turn_walk.jpg"
+ },
+ {
+  "from": "Walk",
+  "to": "Turn",
+  "n": 100,
+  "clip": 131,
+  "frames": [
+   190,
+   270
+  ],
+  "turn": "LEFT",
+  "src": "media/lexicon/06_walk_turn.mp4",
+  "poster": "media/lexicon/06_walk_turn.jpg"
+ },
+ {
+  "from": "Walk",
+  "to": "Immobile",
+  "n": 64,
+  "clip": 618,
+  "frames": [
+   440,
+   500
+  ],
+  "turn": "LEFT",
+  "src": "media/lexicon/07_walk_immobile.mp4",
+  "poster": "media/lexicon/07_walk_immobile.jpg"
+ },
+ {
+  "from": "Turn",
+  "to": "Rear",
+  "n": 46,
+  "clip": 739,
+  "frames": [
+   276,
+   356
+  ],
+  "turn": "LEFT",
+  "src": "media/lexicon/08_turn_rear.mp4",
+  "poster": "media/lexicon/08_turn_rear.jpg"
+ },
+ {
+  "from": "Immobile",
+  "to": "Walk",
+  "n": 44,
+  "clip": 197,
+  "frames": [
+   372,
+   452
+  ],
+  "turn": "STRAIGHT",
+  "src": "media/lexicon/09_immobile_walk.mp4",
+  "poster": "media/lexicon/09_immobile_walk.jpg"
+ },
+ {
+  "from": "Rear",
+  "to": "Walk",
+  "n": 12,
+  "clip": 459,
+  "frames": [
+   170,
+   250
+  ],
+  "turn": "STRAIGHT",
+  "src": "media/lexicon/10_rear_walk.mp4",
+  "poster": "media/lexicon/10_rear_walk.jpg"
+ },
+ {
+  "from": "Walk",
+  "to": "Rear",
+  "n": 5,
+  "clip": 447,
+  "frames": [
+   237,
+   317
+  ],
+  "turn": "STRAIGHT",
+  "src": "media/lexicon/11_walk_rear.mp4",
+  "poster": "media/lexicon/11_walk_rear.jpg"
+ }
+]
