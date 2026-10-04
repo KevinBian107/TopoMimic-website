@@ -1,0 +1,593 @@
+{
+ "w2_dmp_qpos_kmeans": {
+  "name": "DMP-Qpos",
+  "seed": 0,
+  "clusters": [
+   {
+    "label": "Immobile -> Turn Left",
+    "cluster": 1,
+    "size": 64,
+    "members": [
+     {
+      "clip": 117,
+      "frames": [
+       291,
+       358
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c00_m0.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c00_m0.jpg"
+     },
+     {
+      "clip": 41,
+      "frames": [
+       241,
+       397
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c00_m1.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c00_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Rear Straight",
+    "cluster": 2,
+    "size": 31,
+    "members": [
+     {
+      "clip": 1,
+      "frames": [
+       52,
+       196
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c01_m0.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c01_m0.jpg"
+     },
+     {
+      "clip": 1,
+      "frames": [
+       352,
+       463
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c01_m1.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c01_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Turn Left",
+    "cluster": 10,
+    "size": 23,
+    "members": [
+     {
+      "clip": 11,
+      "frames": [
+       245,
+       479
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c02_m0.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c02_m0.jpg"
+     },
+     {
+      "clip": 321,
+      "frames": [
+       71,
+       280
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c02_m1.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c02_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Immobile Left",
+    "cluster": 20,
+    "size": 32,
+    "members": [
+     {
+      "clip": 58,
+      "frames": [
+       126,
+       346
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c03_m0.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c03_m0.jpg"
+     },
+     {
+      "clip": 70,
+      "frames": [
+       84,
+       244
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c03_m1.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c03_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Rear Left",
+    "cluster": 21,
+    "size": 42,
+    "members": [
+     {
+      "clip": 38,
+      "frames": [
+       235,
+       484
+      ],
+      "stride": 3,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c04_m0.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c04_m0.jpg"
+     },
+     {
+      "clip": 123,
+      "frames": [
+       251,
+       405
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmp_qpos_kmeans/c04_m1.mp4",
+      "poster": "media/clusters/w2_dmp_qpos_kmeans/c04_m1.jpg"
+     }
+    ]
+   }
+  ]
+ },
+ "w2_dmc_int_kmeans": {
+  "name": "DMC-Int",
+  "seed": 0,
+  "clusters": [
+   {
+    "label": "Rear -> Turn Right",
+    "cluster": 0,
+    "size": 25,
+    "members": [
+     {
+      "clip": 81,
+      "frames": [
+       179,
+       432
+      ],
+      "stride": 3,
+      "src": "media/clusters/w2_dmc_int_kmeans/c00_m0.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c00_m0.jpg"
+     },
+     {
+      "clip": 135,
+      "frames": [
+       360,
+       451
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmc_int_kmeans/c00_m1.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c00_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Turn -> Immobile Left",
+    "cluster": 1,
+    "size": 88,
+    "members": [
+     {
+      "clip": 21,
+      "frames": [
+       397,
+       448
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmc_int_kmeans/c01_m0.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c01_m0.jpg"
+     },
+     {
+      "clip": 34,
+      "frames": [
+       222,
+       294
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmc_int_kmeans/c01_m1.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c01_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Turn Left",
+    "cluster": 10,
+    "size": 46,
+    "members": [
+     {
+      "clip": 181,
+      "frames": [
+       256,
+       491
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmc_int_kmeans/c02_m0.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c02_m0.jpg"
+     },
+     {
+      "clip": 197,
+      "frames": [
+       10,
+       101
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmc_int_kmeans/c02_m1.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c02_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Immobile Straight",
+    "cluster": 14,
+    "size": 58,
+    "members": [
+     {
+      "clip": 37,
+      "frames": [
+       216,
+       408
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmc_int_kmeans/c03_m0.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c03_m0.jpg"
+     },
+     {
+      "clip": 50,
+      "frames": [
+       24,
+       479
+      ],
+      "stride": 4,
+      "src": "media/clusters/w2_dmc_int_kmeans/c03_m1.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c03_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Rear Straight",
+    "cluster": 18,
+    "size": 64,
+    "members": [
+     {
+      "clip": 1,
+      "frames": [
+       52,
+       276
+      ],
+      "stride": 2,
+      "src": "media/clusters/w2_dmc_int_kmeans/c04_m0.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c04_m0.jpg"
+     },
+     {
+      "clip": 1,
+      "frames": [
+       399,
+       474
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmc_int_kmeans/c04_m1.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c04_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Turn Left",
+    "cluster": 20,
+    "size": 84,
+    "members": [
+     {
+      "clip": 7,
+      "frames": [
+       131,
+       205
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmc_int_kmeans/c05_m0.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c05_m0.jpg"
+     },
+     {
+      "clip": 43,
+      "frames": [
+       236,
+       345
+      ],
+      "stride": 1,
+      "src": "media/clusters/w2_dmc_int_kmeans/c05_m1.mp4",
+      "poster": "media/clusters/w2_dmc_int_kmeans/c05_m1.jpg"
+     }
+    ]
+   }
+  ]
+ },
+ "kpms_keypoint": {
+  "name": "KPMS-KP",
+  "seed": 0,
+  "clusters": [
+   {
+    "label": "Immobile -> Turn Left",
+    "cluster": 0,
+    "size": 177,
+    "members": [
+     {
+      "clip": 7,
+      "frames": [
+       0,
+       500
+      ],
+      "stride": 5,
+      "src": "media/clusters/kpms_keypoint/c00_m0.mp4",
+      "poster": "media/clusters/kpms_keypoint/c00_m0.jpg"
+     },
+     {
+      "clip": 21,
+      "frames": [
+       102,
+       500
+      ],
+      "stride": 4,
+      "src": "media/clusters/kpms_keypoint/c00_m1.mp4",
+      "poster": "media/clusters/kpms_keypoint/c00_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Turn Left",
+    "cluster": 1,
+    "size": 139,
+    "members": [
+     {
+      "clip": 14,
+      "frames": [
+       0,
+       76
+      ],
+      "stride": 1,
+      "src": "media/clusters/kpms_keypoint/c01_m0.mp4",
+      "poster": "media/clusters/kpms_keypoint/c01_m0.jpg"
+     },
+     {
+      "clip": 34,
+      "frames": [
+       0,
+       114
+      ],
+      "stride": 1,
+      "src": "media/clusters/kpms_keypoint/c01_m1.mp4",
+      "poster": "media/clusters/kpms_keypoint/c01_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Immobile Left",
+    "cluster": 2,
+    "size": 117,
+    "members": [
+     {
+      "clip": 93,
+      "frames": [
+       407,
+       500
+      ],
+      "stride": 1,
+      "src": "media/clusters/kpms_keypoint/c02_m0.mp4",
+      "poster": "media/clusters/kpms_keypoint/c02_m0.jpg"
+     },
+     {
+      "clip": 111,
+      "frames": [
+       178,
+       374
+      ],
+      "stride": 2,
+      "src": "media/clusters/kpms_keypoint/c02_m1.mp4",
+      "poster": "media/clusters/kpms_keypoint/c02_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Rear Left",
+    "cluster": 3,
+    "size": 109,
+    "members": [
+     {
+      "clip": 1,
+      "frames": [
+       0,
+       301
+      ],
+      "stride": 3,
+      "src": "media/clusters/kpms_keypoint/c03_m0.mp4",
+      "poster": "media/clusters/kpms_keypoint/c03_m0.jpg"
+     },
+     {
+      "clip": 76,
+      "frames": [
+       405,
+       500
+      ],
+      "stride": 1,
+      "src": "media/clusters/kpms_keypoint/c03_m1.mp4",
+      "poster": "media/clusters/kpms_keypoint/c03_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Turn Right",
+    "cluster": 6,
+    "size": 74,
+    "members": [
+     {
+      "clip": 0,
+      "frames": [
+       0,
+       500
+      ],
+      "stride": 5,
+      "src": "media/clusters/kpms_keypoint/c04_m0.mp4",
+      "poster": "media/clusters/kpms_keypoint/c04_m0.jpg"
+     },
+     {
+      "clip": 114,
+      "frames": [
+       0,
+       500
+      ],
+      "stride": 5,
+      "src": "media/clusters/kpms_keypoint/c04_m1.mp4",
+      "poster": "media/clusters/kpms_keypoint/c04_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Rear Straight",
+    "cluster": 9,
+    "size": 46,
+    "members": [
+     {
+      "clip": 18,
+      "frames": [
+       43,
+       500
+      ],
+      "stride": 4,
+      "src": "media/clusters/kpms_keypoint/c05_m0.mp4",
+      "poster": "media/clusters/kpms_keypoint/c05_m0.jpg"
+     },
+     {
+      "clip": 121,
+      "frames": [
+       58,
+       500
+      ],
+      "stride": 4,
+      "src": "media/clusters/kpms_keypoint/c05_m1.mp4",
+      "poster": "media/clusters/kpms_keypoint/c05_m1.jpg"
+     }
+    ]
+   }
+  ]
+ },
+ "mapper_qpos": {
+  "name": "Mapper-Qpos",
+  "seed": 0,
+  "clusters": [
+   {
+    "label": "Immobile -> Rear Straight",
+    "cluster": 5,
+    "size": 31,
+    "members": [
+     {
+      "clip": 11,
+      "frames": [
+       18,
+       373
+      ],
+      "stride": 3,
+      "src": "media/clusters/mapper_qpos/c00_m0.mp4",
+      "poster": "media/clusters/mapper_qpos/c00_m0.jpg"
+     },
+     {
+      "clip": 18,
+      "frames": [
+       72,
+       371
+      ],
+      "stride": 3,
+      "src": "media/clusters/mapper_qpos/c00_m1.mp4",
+      "poster": "media/clusters/mapper_qpos/c00_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Immobile -> Turn Left",
+    "cluster": 6,
+    "size": 31,
+    "members": [
+     {
+      "clip": 43,
+      "frames": [
+       249,
+       446
+      ],
+      "stride": 2,
+      "src": "media/clusters/mapper_qpos/c01_m0.mp4",
+      "poster": "media/clusters/mapper_qpos/c01_m0.jpg"
+     },
+     {
+      "clip": 74,
+      "frames": [
+       119,
+       500
+      ],
+      "stride": 4,
+      "src": "media/clusters/mapper_qpos/c01_m1.mp4",
+      "poster": "media/clusters/mapper_qpos/c01_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Immobile Left",
+    "cluster": 12,
+    "size": 20,
+    "members": [
+     {
+      "clip": 1,
+      "frames": [
+       194,
+       422
+      ],
+      "stride": 2,
+      "src": "media/clusters/mapper_qpos/c02_m0.mp4",
+      "poster": "media/clusters/mapper_qpos/c02_m0.jpg"
+     },
+     {
+      "clip": 116,
+      "frames": [
+       18,
+       218
+      ],
+      "stride": 2,
+      "src": "media/clusters/mapper_qpos/c02_m1.mp4",
+      "poster": "media/clusters/mapper_qpos/c02_m1.jpg"
+     }
+    ]
+   },
+   {
+    "label": "Rear -> Immobile Straight",
+    "cluster": 21,
+    "size": 12,
+    "members": [
+     {
+      "clip": 625,
+      "frames": [
+       18,
+       500
+      ],
+      "stride": 5,
+      "src": "media/clusters/mapper_qpos/c03_m0.mp4",
+      "poster": "media/clusters/mapper_qpos/c03_m0.jpg"
+     },
+     {
+      "clip": 672,
+      "frames": [
+       248,
+       449
+      ],
+      "stride": 2,
+      "src": "media/clusters/mapper_qpos/c03_m1.mp4",
+      "poster": "media/clusters/mapper_qpos/c03_m1.jpg"
+     }
+    ]
+   }
+  ]
+ }
+}
