@@ -1,6 +1,7 @@
 ---
 import { Font } from "astro:assets";
 
+import TableOfContents from "../components/TableOfContents.astro";
 import "../styles/global.css";
 
 const baseUrl = import.meta.env.BASE_URL;
@@ -9,6 +10,15 @@ const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
 const title = "PCD (Point Cloud Discrete-Morse) walkthrough";
 const description =
   "A stage-by-stage walkthrough of the Point Cloud Discrete-Morse (PCD) pipeline used in TopoMimic, illustrated on a 3D figure-eight cloud.";
+const tocSections = [
+  { id: "intro", label: "The test shape" },
+  { id: "reading-the-cloud-s-local-sampling-scale", label: "Local sampling scale" },
+  { id: "throwing-away-most-candidate-edges", label: "Sparsifying edges" },
+  { id: "turning-density-into-a-height-function", label: "Density as height" },
+  { id: "replaying-the-growth-as-a-persistence-di", label: "Persistence diagram" },
+  { id: "cancelling-noise-and-tracing-the-skeleto", label: "Cancel and trace" },
+  { id: "three-things-easy-to-confuse", label: "Easy to confuse" },
+];
 ---
 
 <!doctype html>
@@ -33,45 +43,27 @@ const description =
     <title>{title}</title>
   </head>
   <body
-    class="prose prose-lg prose-zinc dark:prose-invert prose-a:text-blue-500 prose-a:dark:text-blue-300 prose-a:no-underline prose-a:hover:underline prose-a:font-normal prose-code:bg-zinc-200 prose-code:dark:bg-zinc-800 prose-code:text-zinc-800 prose-code:dark:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none max-w-none pt-16 pb-6 font-(family-name:--font-noto-sans)"
+    class="prose prose-sm sm:prose-lg prose-zinc dark:prose-invert prose-a:text-blue-600 prose-a:dark:text-blue-300 prose-a:no-underline prose-a:hover:underline prose-a:font-normal prose-code:bg-zinc-200 prose-code:dark:bg-zinc-800 prose-code:text-zinc-800 prose-code:dark:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none max-w-none pb-10 font-(family-name:--font-noto-sans)"
   >
-    <header class="mx-auto mb-12 max-w-[56rem] px-6 text-center">
-      <h1 class="text-4xl font-medium sm:text-5xl">{title}</h1>
-      <p class="mt-2 text-base font-medium tracking-wide text-zinc-700 uppercase dark:text-zinc-300">
-        TopoMimic
-      </p>
-      <p class="mt-4 text-zinc-600 dark:text-zinc-400">
-        A guided tour of the Point Cloud Discrete-Morse (PCD) pipeline used by
-        TopoMimic.
-      </p>
-      <div class="not-prose mx-auto mt-6 max-w-2xl rounded-md border border-zinc-200 bg-zinc-50 p-4 text-left text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-        <p class="m-0">
-          <strong>Credit.</strong> Algorithmic ideas from{" "}
-          <a
-            href="https://arxiv.org/abs/2109.07606"
-            class="text-blue-600 hover:underline dark:text-blue-400"
-            target="_blank"
-            rel="noopener">arXiv:2109.07606</a
-          >, implemented in{" "}
-          <a
-            href="https://github.com/lucasjmagee/PCD-Graph-Recon-DM"
-            class="text-blue-600 hover:underline dark:text-blue-400"
-            target="_blank"
-            rel="noopener">PCD-Graph-Recon-DM</a
-          >, which TopoMimic wraps; see the paper for formal definitions.
-        </p>
-      </div>
-      <div class="not-prose mt-6 flex justify-center">
-        <a
-          href={prefix}
-          class="flex flex-row items-center gap-2 rounded-full bg-zinc-800 px-5 py-2 text-base text-white hover:bg-black hover:no-underline dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-50"
-        >
-          ← Back to paper
-        </a>
+    <header class="not-prose bg-zinc-950 text-white">
+      <div class="mx-auto max-w-[72rem] px-6 pt-14 pb-12 text-center sm:pt-20">
+        <div class="mb-3 text-sm font-semibold tracking-[0.25em] text-amber-300 uppercase">Companion tutorial</div>
+        <h1 class="mx-auto max-w-4xl text-4xl leading-tight font-semibold sm:text-6xl">PCD walkthrough</h1>
+        <p class="mx-auto mt-3 max-w-3xl text-lg text-zinc-300 sm:text-2xl">A stage-by-stage tour of the Point Cloud Discrete-Morse pipeline behind <i>Shaped by What's Missing</i></p>
+        <div class="mx-auto mt-8 max-w-2xl rounded-xl border border-white/10 bg-white/5 p-4 text-left text-sm leading-relaxed text-zinc-300">
+          <b class="text-white">Credit.</b> Algorithmic ideas from
+          <a href="https://arxiv.org/abs/2109.07606" class="text-sky-300 hover:underline" target="_blank" rel="noopener">Magee and Wang (arXiv:2109.07606)</a>, implemented in
+          <a href="https://github.com/lucasjmagee/PCD-Graph-Recon-DM" class="text-sky-300 hover:underline" target="_blank" rel="noopener">PCD-Graph-Recon-DM</a>, which our pipeline wraps. See the paper for formal definitions.
+        </div>
+        <div class="mt-6 flex flex-wrap justify-center gap-2">
+          <a href={prefix} class="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-base text-zinc-900 hover:bg-zinc-200">← Back to the project page</a>
+        </div>
       </div>
     </header>
+    <TableOfContents sections={tocSections} />
 
-    <main class="mx-auto max-w-[56rem] px-6">
+    <main class="pt-6">
+      <h2 id="intro">The test shape</h2>
       <p>
         We work with a synthetic 3D figure-eight throughout: two loops joined
         at a single saddle, ~600 points, dense on the lobes and sparse near
@@ -84,7 +76,7 @@ const description =
         one.
       </p>
 
-      <h2>Reading the cloud's local sampling scale</h2>
+      <h2 id="reading-the-cloud-s-local-sampling-scale">Reading the cloud's local sampling scale</h2>
       <p>
         The very first thing the algorithm does is line the points up in a
         <em> farthest-point permutation</em>: at each step pick the point that
@@ -100,9 +92,9 @@ const description =
         shows the dense-on-lobes / sparse-near-the-crossing pattern that all
         downstream stages will key off:
       </p>
-      <div class="not-prose my-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div class="full-bleed not-prose my-8"><div class="mx-auto grid max-w-[64rem] grid-cols-1 gap-6 px-6 md:grid-cols-2">
         <figure class="m-0 flex flex-col">
-          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-100 shadow-sm dark:bg-zinc-800">
             <video
               src={prefix + "figures/dm_walkthrough/02_greedy_permutation.mp4"}
               autoplay
@@ -112,28 +104,28 @@ const description =
               preload="metadata"
               class="h-full w-full object-contain"></video>
           </div>
-          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+          <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 1.</b> 
             Farthest-point insertion order — the algorithm visibly hops
             between the two lobes as the prefix grows. Colour bar = step
             number from 0 to N.
           </figcaption>
         </figure>
         <figure class="m-0 flex flex-col">
-          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-100 shadow-sm dark:bg-zinc-800">
             <img
               src={prefix + "figures/dm_walkthrough/03_intersection_radii.png"}
               alt="intersection radii"
               class="h-full w-full object-contain"
             />
           </div>
-          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+          <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 2.</b> 
             Cloud coloured by λ<sub>i</sub>. Yellow = small (dense
             neighbourhood); dark purple = large (sparse / outlier).
           </figcaption>
         </figure>
-      </div>
+      </div></div>
 
-      <h2>Throwing away most candidate edges</h2>
+      <h2 id="throwing-away-most-candidate-edges">Throwing away most candidate edges</h2>
       <p>
         With a per-vertex sampling scale in hand, the next move is to decide
         which edges of the complete graph on the cloud are even worth keeping.
@@ -153,7 +145,7 @@ const description =
         the sparsifier loosen its grip — at small ε most edges are pruned, at
         ε near 1 most survive:
       </p>
-      <figure class="my-6">
+      <figure class="full-bleed not-prose my-8"><div class="mx-auto max-w-[64rem] px-6">
         <video
           src={prefix + "figures/dm_walkthrough/04_sparsifier_eps_sweep.mp4"}
           autoplay
@@ -161,15 +153,15 @@ const description =
           muted
           playsinline
           preload="metadata"
-          class="mx-auto w-full max-w-2xl rounded-md shadow-sm"></video>
-        <figcaption class="text-center text-sm text-zinc-500">
+          class="mx-auto w-full max-w-3xl rounded-xl shadow-sm"></video>
+        <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 3.</b> 
           Sweeping ε from 0.5 to 0.99: at small ε the sparsifier is aggressive
           (few edges admitted); at ε near 1 most edges survive. The edge count
           appears in the title.
         </figcaption>
-      </figure>
+      </div></figure>
 
-      <h2>Turning density into a height function</h2>
+      <h2 id="turning-density-into-a-height-function">Turning density into a height function</h2>
       <p>
         The surviving vertices and edges now need filtration values — the
         scale α at which each will enter the simplicial complex. Every
@@ -186,18 +178,18 @@ const description =
         the rest of the pipeline will sweep through: the lobes (dense) sit
         low, the crossing region (sparse) sticks up:
       </p>
-      <figure class="my-6">
+      <figure class="full-bleed not-prose my-8"><div class="mx-auto max-w-[64rem] px-6">
         <img
           src={prefix + "figures/dm_walkthrough/05_rms_knn_weights.png"}
           alt="RMS k-NN weights"
-          class="mx-auto max-w-2xl rounded-md shadow-sm"
+          class="mx-auto w-full max-w-3xl rounded-xl shadow-sm"
         />
-        <figcaption class="text-center text-sm text-zinc-500">
+        <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 4.</b> 
           The cloud coloured by w(v). Lobes (dense) are dark; the crossing
           region (sparse) is bright — the inverse-density landscape that the
           rest of the pipeline sweeps over.
         </figcaption>
-      </figure>
+      </div></figure>
       <p>
         Edges and triangles inherit their α from the same density picture.
         Imagine each vertex as a "bubble" of radius w(v); as a single global
@@ -252,7 +244,7 @@ const description =
         this section adds new simplices to it.
       </p>
 
-      <h2>Replaying the growth as a persistence diagram</h2>
+      <h2 id="replaying-the-growth-as-a-persistence-di">Replaying the growth as a persistence diagram</h2>
       <p>
         Run the growth on the figure-eight and you get a continuous sweep
         that vacuums up the cloud bottom-first — basins fill long before
@@ -269,9 +261,9 @@ const description =
         this stage does no thresholding, so every feature, however trivial,
         is in the diagram:
       </p>
-      <div class="not-prose my-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div class="full-bleed not-prose my-8"><div class="mx-auto grid max-w-[64rem] grid-cols-1 gap-6 px-6 md:grid-cols-2">
         <figure class="m-0 flex flex-col">
-          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-100 shadow-sm dark:bg-zinc-800">
             <video
               src={prefix + "figures/dm_walkthrough/06_filtration_alpha_sweep.mp4"}
               autoplay
@@ -281,29 +273,29 @@ const description =
               preload="metadata"
               class="h-full w-full object-contain"></video>
           </div>
-          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+          <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 5.</b> 
             α grows from 0 to ∞: vertices appear in ascending w (dense lobes
             first), edges connect in ascending α, triangles fill the loops as
             their third edge enters.
           </figcaption>
         </figure>
         <figure class="m-0 flex flex-col">
-          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-100 shadow-sm dark:bg-zinc-800">
             <img
               src={prefix + "figures/dm_walkthrough/07_persistence_diagram.png"}
               alt="persistence diagram"
               class="h-full w-full object-contain"
             />
           </div>
-          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+          <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 6.</b> 
             The diagram. Two long-persistence H<sub>1</sub> pairs = two lobes;
             the noise cluster sits near the diagonal. δ (red dashed line) is
             the cancellation threshold the next section applies.
           </figcaption>
         </figure>
-      </div>
+      </div></div>
 
-      <h2>Cancelling noise and tracing the skeleton</h2>
+      <h2 id="cancelling-noise-and-tracing-the-skeleto">Cancelling noise and tracing the skeleton</h2>
       <p>
         Only at the very last step does the persistence threshold δ enter the
         picture. The Forman cancellation rule says: every persistence pair
@@ -321,9 +313,9 @@ const description =
         then shallower basins, until eventually only the most persistent
         loop survives:
       </p>
-      <div class="not-prose my-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div class="full-bleed not-prose my-8"><div class="mx-auto grid max-w-[64rem] grid-cols-1 gap-6 px-6 md:grid-cols-2">
         <figure class="m-0 flex flex-col">
-          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-100 shadow-sm dark:bg-zinc-800">
             <video
               src={prefix + "figures/dm_walkthrough/08_delta_cancellation.mp4"}
               autoplay
@@ -333,14 +325,14 @@ const description =
               preload="metadata"
               class="h-full w-full object-contain"></video>
           </div>
-          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+          <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 7.</b> 
             Sweeping δ upward: noise pairs cancel first, then shallower
             basins, then eventually one of the H<sub>1</sub> classes —
             G<sub>M</sub>'s edge count appears in the title.
           </figcaption>
         </figure>
         <figure class="m-0 flex flex-col">
-          <div class="aspect-[4/3] w-full overflow-hidden rounded-md bg-zinc-100 shadow-sm dark:bg-zinc-800">
+          <div class="aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-100 shadow-sm dark:bg-zinc-800">
             <video
               src={prefix + "figures/dm_walkthrough/09_v_path_tracing.mp4"}
               autoplay
@@ -350,14 +342,14 @@ const description =
               preload="metadata"
               class="h-full w-full object-contain"></video>
           </div>
-          <figcaption class="mt-2 text-center text-sm text-zinc-500">
+          <figcaption class="mt-2 text-left text-sm leading-relaxed text-zinc-500 italic"><b class="not-italic text-zinc-700">Figure 8.</b> 
             Descending V-paths drawn step-by-step. Stars are the two most
             persistent basin minima; the coloured edges are two edge-disjoint
             V-paths between them, traced one edge at a time through the
             Forman matching.
           </figcaption>
         </figure>
-      </div>
+      </div></div>
       <p>
         <strong>Milestone — the discrete-Morse skeleton G<sub>M</sub> is
         fully formed here.</strong>{" "}
@@ -369,7 +361,7 @@ const description =
         H<sub>0</sub>).
       </p>
 
-      <h2>Three things easy to confuse</h2>
+      <h2 id="three-things-easy-to-confuse">Three things easy to confuse</h2>
       <ul>
         <li>
           <strong>SWR 1-skeleton ≠ discrete-Morse skeleton.</strong> The former
@@ -395,8 +387,8 @@ const description =
 
     </main>
 
-    <footer class="mx-auto mt-12 max-w-[56rem] px-6 text-center">
-      <p class="prose-sm text-center">
+    <footer class="mx-auto mt-16 max-w-[50rem] px-6 text-center">
+      <p class="prose-sm text-center text-zinc-400">
         Tutorial companion to <a href={prefix}>Shaped by What's Missing</a>.
       </p>
     </footer>
