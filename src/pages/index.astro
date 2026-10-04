@@ -1,107 +1,157 @@
 ---
 import { Font } from "astro:assets";
-
-import Links from "../components/Links.astro";
-import Authors from "../components/Authors.astro";
-import Notes from "../components/Notes.astro";
-import type { Author, Affiliation, Note, Link } from "../types/types";
+import { Icon } from "astro-icon/components";
 
 import Table from "../components/Table.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import DMTerrain from "../components/interactive/DMTerrain.tsx";
+import terrainJson from "../data/dm_terrain.json";
 
 import "../styles/global.css";
 import "katex/dist/katex-swap.css";
 
-import { Content, frontmatter, getHeadings } from "../paper.mdx";
-import TableOfContents from "../components/TableOfContents.astro";
+import { Content } from "../content.mdx";
 
-// Astro MDX modules expose headings via getHeadings(); fall back if not present.
-const headings = (typeof getHeadings === "function" ? getHeadings() : []) ?? [];
+const title = "Shaped by What's Missing";
+const subtitle = "Topological Invariance Simplification Discovers Behavioral Transitions";
+const description =
+  "Behavioral transitions read directly off the shape of a trajectory: discrete-Morse skeletons of rat behavior, decomposed into DM-paths and DM-cycles, recover transitions without any upstream state partition.";
 
-interface Frontmatter {
-  title: string;
-  authors: Author[];
-  affiliations?: Affiliation[];
-  conference?: string;
-  notes?: Note[];
-  links?: Link[];
-  description?: string;
-  favicon: string;
-  thumbnail?: string;
-  theme?: "device" | "light" | "dark";
-}
+const authors = [
+  { name: "Kaiwen Bian", aff: "1,2" },
+  { name: "Eric J. Leonardis", aff: "2" },
+  { name: "Yuanjia Yang", aff: "1,2" },
+  { name: "Charles Zhang", aff: "3" },
+  { name: "Yusu Wang", aff: "1" },
+  { name: "Talmo D. Pereira", aff: "2" },
+];
+const affiliations = ["University of California San Diego", "Salk Institute for Biological Studies", "Harvard University"];
 
-const {
-  title,
-  authors,
-  affiliations,
-  conference,
-  notes,
-  links,
-  description,
-  favicon,
-  thumbnail,
-  theme = "device",
-} = frontmatter as Frontmatter;
+const terrain = terrainJson as unknown as Parameters<typeof DMTerrain>[0]["data"];
 
 const baseUrl = import.meta.env.BASE_URL;
 const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+
+const links = [
+  { name: "Paper", url: "", icon: "ri:file-pdf-2-line", soon: true },
+  { name: "Code", url: "https://github.com/KevinBian107/TopoMIMIC", icon: "ri:github-line" },
+  { name: "Annotation tool", url: "https://github.com/KevinBian107/TopoMimic-annotation", icon: "ri:price-tag-3-line" },
+  { name: "PCD walkthrough", url: prefix + "tutorial", icon: "ri:route-line" },
+  { name: "Citation", url: "#citation", icon: "ri:double-quotes-l" },
+];
+
+const tocSections = [
+  { id: "idea", label: "The idea" },
+  { id: "data", label: "Rat and simulator" },
+  { id: "lexicon", label: "Behavior lexicon" },
+  { id: "method", label: "How it works" },
+  { id: "intuition", label: "Why a skeleton" },
+  { id: "clusters", label: "Discovered clusters" },
+  { id: "information", label: "Transition information" },
+  { id: "alignment", label: "Alignment" },
+  { id: "citation", label: "Citation" },
+];
 ---
 
 <!doctype html>
-<html class="bg-white dark:bg-zinc-900" lang="en" data-theme={theme}>
+<html class="bg-white dark:bg-zinc-900" lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    {description && <meta name="description" content={description} />}
+    <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-
-    <link rel="icon" type="image/png" href={prefix + favicon} />
-
-    <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
+    <link rel="icon" type="image/png" href={prefix + "favicon.png"} />
+    <meta property="og:title" content={`${title}: ${subtitle}`} />
+    <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    {thumbnail && <meta property="og:image" content={prefix + thumbnail} />}
-
-    <Font
-      cssVariable="--font-noto-sans"
-      preload={[{ subset: "latin", style: "normal" }]}
-    />
-
-    <title>{title}</title>
+    <meta property="og:image" content={prefix + "media/lexicon/05_turn_walk.jpg"} />
+    <Font cssVariable="--font-noto-sans" preload={[{ subset: "latin", style: "normal" }]} />
+    <title>{`${title}: ${subtitle}`}</title>
   </head>
   <body
-    class="prose prose-lg prose-zinc dark:prose-invert prose-a:text-blue-500 prose-a:dark:text-blue-300 prose-a:no-underline prose-a:hover:underline prose-a:font-normal prose-code:bg-zinc-200 prose-code:dark:bg-zinc-800 prose-code:text-zinc-800 prose-code:dark:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none max-w-none pt-16 pb-6 font-(family-name:--font-noto-sans)"
+    class="prose prose-sm sm:prose-lg prose-zinc dark:prose-invert prose-a:text-blue-600 prose-a:dark:text-blue-300 prose-a:no-underline prose-a:hover:underline prose-a:font-normal prose-code:bg-zinc-200 prose-code:dark:bg-zinc-800 prose-code:text-zinc-800 prose-code:dark:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none max-w-none pb-10 font-(family-name:--font-noto-sans)"
   >
-    <header class="mx-auto mb-12 max-w-[56rem] px-6 text-center">
-      <h1 class="text-5xl font-medium">{title}</h1>
-      <div class="flex flex-col items-center gap-6">
-        <Authors authors={authors} affiliations={affiliations} />
-        {conference && <div>{conference}</div>}
-        {notes && <Notes notes={notes} />}
-        {links && <Links links={links} />}
+    <header class="not-prose bg-zinc-950 text-white">
+      <div class="mx-auto max-w-[72rem] px-6 pt-14 pb-12 sm:pt-20">
+        <div class="text-center">
+          <div class="mb-3 text-sm font-semibold tracking-[0.25em] text-sky-300 uppercase">TopoMimic</div>
+          <h1 class="mx-auto max-w-5xl text-3xl leading-tight font-semibold sm:text-5xl">{title}<br />{subtitle}</h1>
+          <div class="mx-auto mt-6 flex max-w-4xl flex-wrap justify-center gap-x-5 gap-y-1.5 text-base text-zinc-200 sm:text-lg">
+            {
+              authors.map((a) => (
+                <span>
+                  {a.name}
+                  <sup class="ml-0.5 text-xs text-zinc-400">{a.aff}</sup>
+                </span>
+              ))
+            }
+          </div>
+          <div class="mx-auto mt-3 flex max-w-4xl flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-zinc-400">
+            {
+              affiliations.map((a, i) => (
+                <span>
+                  <sup class="mr-0.5">{i + 1}</sup>
+                  {a}
+                </span>
+              ))
+            }
+          </div>
+          <div class="mt-4 text-sm text-zinc-300 sm:text-base">NeurIPS 2026 Workshop on Symmetry and Geometry in Neural Representations (NeurReps)</div>
+          <div class="mt-6 flex flex-wrap justify-center gap-2">
+            {
+              links.map((l) =>
+                l.soon ? (
+                  <span class="flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-1.5 text-sm text-zinc-400 sm:px-5 sm:py-2 sm:text-base">
+                    <Icon name={l.icon} />
+                    {l.name} <span class="text-xs">(coming soon)</span>
+                  </span>
+                ) : (
+                  <a href={l.url} class="flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm text-zinc-900 hover:bg-zinc-200 sm:px-5 sm:py-2 sm:text-base">
+                    <Icon name={l.icon} />
+                    {l.name}
+                  </a>
+                ),
+              )
+            }
+          </div>
+        </div>
+
+        <div class="mt-12 grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+          <div>
+            <h2 class="mb-3 text-lg font-semibold text-zinc-100">Abstract</h2>
+            <p class="text-justify text-[0.95rem] leading-relaxed text-zinc-300">
+            Understanding how animals move between behaviors is a central question in neuroethology, yet most segmentation methods first partition time into discrete states,
+            leaving transitions as the unmodeled residue between them. We take the opposite view: in a suitable feature space, sustained behaviors are dense regions of the
+            trajectory's density landscape, and transitions are the sparse corridors and loops that connect them. Because this structure is a property of the landscape's
+            shape rather than of any particular coordinates, it can be read off directly with topology and should persist across feature spaces. We build this landscape from
+            frame-by-frame trajectories, extract its discrete-Morse graph, and keep two kinds of structure: <b class="text-white">paths</b>, the corridors a trajectory follows
+            between dense behavioral regions, and <b class="text-white">cycles</b>, closed routes whose entry and exit take different ways. Clustering these structures yields
+            transitions directly, with no upstream state partition. On a rat behavior dataset across three feature spaces, including the latent space of a neural-network
+            controller that imitates the animal in a physics simulator, the approach recovers transitions at coverage comparable to state-space and topological-clustering
+            baselines, while carrying substantially more information about the transition identity, forming clusters at least as tight as the baselines', and matching
+            annotated transitions with less reliance on time-warping. More broadly, the results show that behavioral transitions are a topological feature of a
+            representation: recoverable from the shape of its trajectories, and consistent across distinct feature spaces.
+          </p>
+          </div>
+          <div>
+            <DMTerrain client:load data={terrain} hero />
+            <p class="mt-2 text-center text-xs text-zinc-400">
+              The idea behind the method, on the road-network example it was built for. Points sampled around a hidden graph form a density terrain; discrete-Morse
+              reconstruction recovers the graph as the terrain's ridges (red). Raising the persistence threshold δ cancels the least significant ridges first, until only
+              the most persistent loops remain. In the paper the points are behavior frames and the ridges are behavioral transitions.
+            </p>
+          </div>
+        </div>
       </div>
     </header>
-    <TableOfContents
-      headings={headings}
-      labels={{
-        "abstract": "Abstract",
-        "a-look-at-what-the-method-sees": "Method",
-        "the-shape-of-a-familiar-manifold": "Manifold",
-        "the-shape-of-a-behavior-landscape": "Landscape",
-        "the-shape-of-a-transition": "Transition",
-        "recovering-transitions-from-shape-alone": "Recovery",
-        "bibtex-citation": "BibTeX",
-      }}
-    />
-    <main>
+
+    <TableOfContents sections={tocSections} />
+    <main class="pt-6">
       <Content components={{ table: Table }} />
     </main>
-    <footer class="mx-auto max-w-[56rem] px-6 text-center">
-      <p class="prose-sm text-center">
-        Built with <a
-          href="https://research-template.roman.technology"
-          rel="nofollow">Roman Hauksson-Neill's project page template</a
-        >
+    <footer class="mx-auto mt-16 max-w-[50rem] px-6 text-center">
+      <p class="prose-sm text-center text-zinc-400">
+        Built with <a href="https://research-template.roman.technology" rel="nofollow">Roman Hauksson-Neill's project page template</a>.
       </p>
     </footer>
   </body>

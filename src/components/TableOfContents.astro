@@ -1,34 +1,15 @@
 ---
-interface Heading {
-  depth: number;
-  slug: string;
-  text: string;
-}
-
 interface Props {
-  headings: Heading[];
-  /** Heading depths to include (default: 2 only, matching MOSAIC's TOC). */
-  depths?: number[];
-  /** Optional label overrides keyed by slug. */
-  labels?: Record<string, string>;
+  sections: { id: string; label: string }[];
 }
-
-const {
-  headings,
-  depths = [2, 3],
-  labels = {},
-} = Astro.props as Props;
-
-const items = (headings ?? []).filter((h) => depths.includes(h.depth));
+const { sections } = Astro.props;
 ---
 
-<nav id="toc" class="toc-nav" aria-label="Table of contents">
+<nav id="toc" class="toc-nav">
   <ul>
-    {items.map((h) => (
+    {sections.map((s) => (
       <li>
-        <a href={"#" + h.slug} data-toc-link={h.slug}>
-          {labels[h.slug] ?? h.text}
-        </a>
+        <a href={`#${s.id}`} data-toc-link={s.id}>{s.label}</a>
       </li>
     ))}
   </ul>
@@ -38,60 +19,60 @@ const items = (headings ?? []).filter((h) => depths.includes(h.depth));
   .toc-nav {
     position: fixed;
     top: 50%;
-    /* Anchor the TOC just to the LEFT of the centered content column
-       (text column is max-width 56rem). Width = 12rem, gap to column = 1.5rem. */
-    left: calc(50vw - 28rem - 12rem - 1.5rem);
+    left: 1rem;
     transform: translateY(-50%);
-    z-index: 40;
-    width: 12rem;
+    width: 11rem;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 50;
+    padding: 0.5rem 0;
     opacity: 0;
-    transition: opacity 0.25s ease;
     pointer-events: none;
+    transition: opacity 0.8s ease;
   }
+
   .toc-nav.visible {
     opacity: 1;
     pointer-events: auto;
   }
+
   .toc-nav ul {
     list-style: none;
-    margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+    margin: 0;
+    border-left: 2px solid #e5e7eb;
   }
+
   .toc-nav li {
     margin: 0;
     padding: 0;
   }
+
   .toc-nav a {
     display: block;
-    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+    font-size: 0.72rem;
     line-height: 1.3;
-    color: var(--color-zinc-500, #71717a);
+    color: #9ca3af;
     text-decoration: none;
     border-left: 2px solid transparent;
-    padding: 0.1rem 0 0.1rem 0.6rem;
-    transition: color 0.15s ease, border-color 0.15s ease;
+    margin-left: -2px;
+    transition: color 0.2s, border-color 0.2s;
   }
+
   .toc-nav a:hover {
-    color: var(--color-zinc-900, #18181b);
+    color: #374151;
+    text-decoration: none;
   }
+
   .toc-nav a.active {
-    color: var(--color-zinc-900, #18181b);
-    border-left-color: var(--color-zinc-900, #18181b);
-    font-weight: 500;
+    color: #2563eb;
+    border-left-color: #2563eb;
+    font-weight: 600;
   }
-  :global([data-theme="dark"]) .toc-nav a {
-    color: var(--color-zinc-400, #a1a1aa);
-  }
-  :global([data-theme="dark"]) .toc-nav a:hover,
-  :global([data-theme="dark"]) .toc-nav a.active {
-    color: var(--color-zinc-100, #f4f4f5);
-    border-left-color: var(--color-zinc-100, #f4f4f5);
-  }
-  /* Hide the TOC on small/narrow viewports — the prose column should breathe. */
-  @media (max-width: 1280px) {
+
+  /* Hide unless the 64rem-wide column leaves room for the sidebar */
+  @media (max-width: 90rem) {
     .toc-nav {
       display: none;
     }
@@ -100,43 +81,47 @@ const items = (headings ?? []).filter((h) => depths.includes(h.depth));
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const toc = document.getElementById("toc");
-    if (!toc) return;
-    const links = Array.from(toc.querySelectorAll<HTMLElement>("[data-toc-link]"));
-    const targets = links
-      .map((a) => ({ id: a.dataset.tocLink!, link: a, el: document.getElementById(a.dataset.tocLink!) }))
-      .filter((t) => t.el !== null);
-    if (!targets.length) return;
+    const toc = document.getElementById("toc")!;
+    const links = document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]");
+    const sections = Array.from(links).map((link) => {
+      const id = link.getAttribute("data-toc-link")!;
+      return { id, el: document.getElementById(id), link };
+    }).filter((s) => s.el !== null);
 
-    // Hide TOC while the header (above all sections) is on screen; show once
-    // we've scrolled into content. Mirrors MOSAIC's pattern.
-    const headerEl = document.querySelector("header");
-    if (headerEl) {
-      new IntersectionObserver(
+    if (sections.length === 0) return;
+
+    // Fade in after scrolling fully past the abstract (highlighted section)
+    const abstractSection = document.querySelector("header");
+    if (abstractSection) {
+      const abstractObserver = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) toc.classList.remove("visible");
-          else toc.classList.add("visible");
+          if (entry.isIntersecting) {
+            toc.classList.remove("visible");
+          } else {
+            toc.classList.add("visible");
+          }
         },
-        { threshold: 0 },
-      ).observe(headerEl);
-    } else {
-      toc.classList.add("visible");
+        { threshold: 0 }
+      );
+      abstractObserver.observe(abstractSection);
     }
 
-    // Highlight the section currently most prominently in view.
-    const obs = new IntersectionObserver(
+    // Scroll-spy for active section
+    const sectionObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach((e) => {
-          if (!e.isIntersecting) return;
-          const id = e.target.id;
-          const t = targets.find((x) => x.id === id);
-          if (!t) return;
-          links.forEach((l) => l.classList.remove("active"));
-          t.link.classList.add("active");
+        entries.forEach((entry) => {
+          const id = entry.target.id;
+          const match = sections.find((s) => s.id === id);
+          if (!match) return;
+          if (entry.isIntersecting) {
+            links.forEach((l) => l.classList.remove("active"));
+            match.link.classList.add("active");
+          }
         });
       },
-      { rootMargin: "-20% 0px -60% 0px" },
+      { rootMargin: "-20% 0px -60% 0px" }
     );
-    targets.forEach((t) => obs.observe(t.el!));
+
+    sections.forEach((s) => sectionObserver.observe(s.el!));
   });
 </script>
