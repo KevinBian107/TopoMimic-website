@@ -1,5 +1,6 @@
 import { Image } from "astro:assets";
 import Wide from "./components/Wide.astro";
+import HighlightedSection from "./components/HighlightedSection.astro";
 import PipelineExplorer from "./components/interactive/PipelineExplorer.tsx";
 import DMTerrain from "./components/interactive/DMTerrain.tsx";
 import SplitTreeDemo from "./components/interactive/SplitTreeDemo.tsx";
@@ -22,6 +23,12 @@ export const base = import.meta.env.BASE_URL;
 How an animal moves from one behavior to the next, walking into a rear or a rear into a turn, is a central question in neuroethology. Yet the standard tools describe transitions only after a coarse-graining. An autoregressive HMM such as Keypoint-MoSeq assigns every frame a syllable and summarizes transitions as a matrix over syllables. A variational autoencoder partitions a latent embedding. Mapper builds a graph over overlapping density patches. In each case the states come first, and a transition is whatever lies between two of them, at whatever resolution the state assignment allows.
 
 We take the opposite view. In a suitable feature space a sustained behavior is a **dense region** of the trajectory: the animal spends many frames there. A transition is the **sparse corridor or loop** that connects dense regions: the trajectory passes through it quickly and rarely. That structure belongs to the *shape* of the density landscape, a region of the space shaped by what is missing, so it can be read off directly with topology and should look the same in different coordinates.
+
+<HighlightedSection>
+
+**The skeleton is a filter.** A raw behavioral trajectory is noisy: frames jitter around each behavior, and many never recur closely enough to form any structure. Discrete-Morse reconstruction keeps only the frames that lie on persistent ridges of the density landscape and cancels ridges too weak to survive persistence, while the Takens window and the split at temporal gaps keep only stretches that hang together in time. The result is a spatiotemporal filter on the raw feature space, the same one that recovers a road network from noisy car positions. What reaches the clustering, and the comparison to ground truth, is the cleaned signal rather than the raw trajectory. We see this as the main benefit of the method: the primitives carry more transition information than any baseline, form clusters at least as tight, and follow the annotated transitions with less time-warping.
+
+</HighlightedSection>
 
 <Wide n={1} title="Method overview.">
   <Image src={overview} alt="Method overview: trajectory, skeleton, DM-cycle and DM-path, transition clusters" class="w-full" />
@@ -88,7 +95,7 @@ Below is that construction run for real (for a stage-by-stage account of the alg
   </Fragment>
 </Wide>
 
-On a trajectory the same logic applies, with behaviors in place of junctions. Frames of a sustained behavior pile up into a density peak; the frames where the body reconfigures from one behavior to the next are few and spread out, so they form a low-density ridge between peaks. The skeleton is that set of ridges, and Step 2 cuts it into two kinds of piece.
+Read the other way, the construction is a filter: the noisy samples scattered around the roads are discarded, and what remains is the clean network. On a trajectory the same logic applies, with behaviors in place of junctions. Frames of a sustained behavior pile up into a density peak; the frames where the body reconfigures from one behavior to the next are few and spread out, so they form a low-density ridge between peaks. The skeleton is that set of ridges, so the frames that survive are the clean part of the trajectory, and Step 2 cuts it into two kinds of piece.
 
 <Wide n={6} title="The two DM primitives on one skeleton.">
   <SplitTreeDemo client:visible />
@@ -121,11 +128,15 @@ Every method turns a clip into a per-frame label T: a primitive index for ours, 
   </Fragment>
 </Wide>
 
-DM cycles and paths in intention and qpos reach the top of the plane. The qpos DM-path carries the most transition information of any method, **0.90 bits**, against **0.53** for the strongest baseline, Keypoint-MoSeq on keypoints, with intention DM-cycles close behind at 0.87. Correcting for label cardinality the lead is AMI **0.23 against 0.16**; Mapper and Keypoint-MoSeq on intention stay at AMI ≤ 0.12. The ordering within DM, intention ≈ qpos > ekp, is the one the drift argument predicts.
+DM cycles and paths in intention and qpos reach the top of the plane. The qpos DM-path carries the most transition information of any method, **0.90 bits**, against **0.53** for the strongest baseline, Keypoint-MoSeq on keypoints, with intention DM-cycles close behind at 0.87. Correcting for label cardinality the lead is AMI **0.23 against 0.16**; Mapper and Keypoint-MoSeq on intention stay at AMI 0.08 to 0.12. We read this gain through the filter: a DM label is given only to frames on a persistent ridge, so it groups the cleaned part of the trajectory rather than every frame of the raw one. The ordering within DM, intention ≈ qpos > ekp, is the one the drift argument predicts.
 
 <h2 id="alignment">Alignment, coherence and warping</h2>
 
-Do the discovered clusters match the annotated transitions frame by frame? Each family is represented by its highest-information variant. Both DM variants align closest to the annotated boundaries on average, 0.04 to 0.06 below Keypoint-MoSeq and 0.01 to 0.03 below Mapper in mean DTW, but per row the picture is less one-sided: the DM columns win 6 of the 11 DTW rows. The warping decomposition separates the cases. The DM columns have the lower non-diagonal fraction on **9 of 11** rows and the higher sync ratio on 9 of 11; Keypoint-MoSeq leads on neither. Where Keypoint-MoSeq approaches our DTW, it does so by stretching a primitive onto the annotated window.
+Do the discovered clusters match the annotated transitions frame by frame? Each family is represented by one fixed variant, the one carrying the most transition information, held constant down its column rather than picked per row, over the 11 discovered transitions that more than one family recovers.
+
+Counting rows, the DM family (intention DM-cycles and qpos DM-paths) is the most internally coherent on **9 of 11** transitions, against 2 for Mapper and none for Keypoint-MoSeq. Alignment to the annotated boundaries is split more evenly: the DM family has the lowest DTW on 5 rows, Keypoint-MoSeq on 4 and Mapper on 2, so DTW alone does not separate the methods. The warping decomposition does. The DM family has the lowest non-diagonal fraction on **9 of 11** rows and the highest sync ratio on 9 of 11; Keypoint-MoSeq leads on neither. On each of the 4 rows where Keypoint-MoSeq has the lowest DTW, its warping path is less diagonal than ours: it gets there by stretching a primitive onto the annotated window, while the DM primitives follow the window at their own timescale.
+
+This is the filter at work. A DM primitive is not a window cut from the raw trajectory but the frames on its persistent density ridges, so both the clustering and the comparison to ground truth run on the cleaned signal. A full-clip control that clusters the same intention trajectories with the same Wasserstein backend, but without the filter, is less aligned and less coherent than either DM variant.
 
 <Wide n={9} title="Alignment by directed transition.">
   <AlignmentTable client:visible />
@@ -134,9 +145,9 @@ Do the discovered clusters match the annotated transitions frame by frame? Each 
   </Fragment>
 </Wide>
 
-On KID, which ignores frame order and cannot warp, intention DM-cycles trail Keypoint-MoSeq by 13%, and we claim no distributional advantage. KID rewards breadth: a Keypoint-MoSeq cluster holds a median of about 14,000 frames against 3,800 for qpos DM-paths, sampling the window more fully while being markedly less coherent. Coverage is comparable: intention DM-cycles reach 10 of the 16 discovered directed transitions, against 11 for Mapper on intention and 9 for Keypoint-MoSeq on keypoints. The families are not nested. Four transitions, among them Walk → Turn [L] and Walk → Immobile [S], are found only by DM primitives, and Rear → Immobile [R] only by Mapper.
+On KID, which ignores frame order and cannot warp, intention DM-cycles trail Keypoint-MoSeq by 13%, and we claim no distributional advantage. KID rewards breadth: a Keypoint-MoSeq cluster holds a median of about 14,000 frames against 4,000 for qpos DM-paths, sampling the window more fully while being markedly less coherent. Coverage is comparable: intention DM-cycles reach 10 of the 16 discovered directed transitions, against 11 for Mapper on intention and 9 for Keypoint-MoSeq on keypoints. The families are not nested. Four transitions, among them Walk → Turn [L] and Walk → Immobile [S], are found only by DM primitives, and Rear → Immobile [R] only by Mapper.
 
-Three controls rule out simpler explanations. None of 110 baseline variants, sweeping Keypoint-MoSeq stickiness and state count and Mapper lens and interval count, improves on the tuned baselines. A full-clip control that skips the decomposition does worse than both DM variants in alignment (0.888) and coherence (0.797), so the decomposition, not the Wasserstein clustering, recovers the transitions. And DTW varies by at most 0.03 across the k-NN parameter in every space.
+Three controls rule out simpler explanations. None of 110 baseline variants, sweeping Keypoint-MoSeq stickiness and state count and Mapper lens and interval count, improves on the tuned baselines. A full-clip control that skips the decomposition does worse than both DM variants in alignment (0.888) and coherence (0.797), so the decomposition, not the Wasserstein clustering, recovers the transitions. And DM-cycle DTW varies by at most 0.03 across the k-NN parameter in every space.
 
 <h2 id="citation">Citation</h2>
 

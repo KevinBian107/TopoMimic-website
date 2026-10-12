@@ -15,7 +15,7 @@ import { Content } from "../content.mdx";
 const title = "Shaped by What's Missing";
 const subtitle = "Topological Invariance Simplification Discovers Behavioral Transitions";
 const description =
-  "Behavioral transitions read directly off the shape of a trajectory: discrete-Morse skeletons of rat behavior, decomposed into DM-paths and DM-cycles, recover transitions without any upstream state partition.";
+  "Behavioral transitions read directly off the shape of a trajectory: discrete-Morse skeletons of rat behavior, decomposed into DM-paths and DM-cycles, recover transitions without any upstream state partition. The skeleton acts as a spatiotemporal filter, so transitions are read from the clean signal rather than the noisy trajectory.";
 
 const authors = [
   { name: "Kaiwen Bian", aff: "1,2" },
@@ -138,7 +138,8 @@ const tocSections = [
             <p class="mt-2 text-center text-xs text-zinc-400">
               The idea behind the method, on the road-network example it was built for. Points sampled around a hidden graph form a density terrain; discrete-Morse
               reconstruction recovers the graph as the terrain's ridges (red). Raising the persistence threshold δ cancels the least significant ridges first, until only
-              the most persistent loops remain. In the paper the points are behavior frames and the ridges are behavioral transitions.
+              the most persistent loops remain. The reconstruction is also a filter: the noisy samples off the ridges drop out and the clean network is what remains. In the paper
+              the points are behavior frames, the ridges are behavioral transitions, and the filter hands the analysis the clean behavioral signal instead of the raw trajectory.
             </p>
           </div>
         </div>

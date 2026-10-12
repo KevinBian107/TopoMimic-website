@@ -5,10 +5,10 @@ type Cell = number | null | [number, "†"];
 const COLS = ["DMC-Int*", "DMP-Qpos*", "Mapper-Qpos", "KPMS-KP"];
 const ROWS: { t: string; v: Record<string, Cell[]> }[] = [
   { t: "Immobile → Rear [L]", v: { dtw: [null, 0.854, null, 0.831], con: [null, 0.803, null, 0.821], nd: [null, 0.128, null, 0.245], kid: [null, 0.002, null, 0.006] } },
-  { t: "Rear → Immobile [L]", v: { dtw: [null, [0.855, "†"], 0.879, 0.855], con: [null, [0.659, "†"], 0.743, 0.708], nd: [null, [0.111, "†"], 0.178, 0.165], kid: [null, [0.026, "†"], 0.009, 0.01] } },
+  { t: "Rear → Immobile [L]", v: { dtw: [null, [0.8551, "†"], 0.879, 0.8548], con: [null, [0.659, "†"], 0.743, 0.708], nd: [null, [0.111, "†"], 0.178, 0.165], kid: [null, [0.026, "†"], 0.009, 0.01] } },
   { t: "Immobile → Rear [R]", v: { dtw: [null, [0.88, "†"], null, [0.848, "†"]], con: [null, [0.718, "†"], null, [0.854, "†"]], nd: [null, [0.17, "†"], null, [0.173, "†"]], kid: [null, [0.033, "†"], null, [0.01, "†"]] } },
   { t: "Immobile → Rear [S]", v: { dtw: [0.934, 0.892, 0.895, 0.967], con: [0.766, 0.632, 0.714, 0.936], nd: [0.08, 0.063, 0.055, 0.096], kid: [0.032, 0.024, 0.01, 0.011] } },
-  { t: "Rear → Immobile [S]", v: { dtw: [[0.863, "†"], null, 0.856, 0.877], con: [[0.802, "†"], null, 0.765, 0.816], nd: [[0.08, "†"], null, 0.052, 0.109], kid: [[0.011, "†"], null, 0.008, 0.008] } },
+  { t: "Rear → Immobile [S]", v: { dtw: [[0.863, "†"], null, 0.856, 0.877], con: [[0.802, "†"], null, 0.765, 0.816], nd: [[0.08, "†"], null, 0.052, 0.109], kid: [[0.011, "†"], null, 0.0077, 0.0078] } },
   { t: "Immobile → Turn [L]", v: { dtw: [0.809, 0.788, 0.801, 0.77], con: [0.652, 0.724, 0.69, 0.686], nd: [0.012, 0.019, 0.033, 0.036], kid: [0.009, 0.003, 0.006, 0.002] } },
   { t: "Turn → Immobile [L]", v: { dtw: [0.74, 0.721, 0.79, [0.849, "†"]], con: [0.601, 0.585, 0.59, [0.659, "†"]], nd: [0.032, 0.054, 0.062, [0.086, "†"]], kid: [0.005, 0.008, 0.01, [0.013, "†"]] } },
   { t: "Immobile → Turn [R]", v: { dtw: [0.759, [0.756, "†"], [0.715, "†"], 0.747], con: [0.703, [0.729, "†"], [0.669, "†"], 0.688], nd: [0.013, [0.005, "†"], [0.019, "†"], 0.025], kid: [0.007, [0.009, "†"], [0.008, "†"], 0.003] } },
@@ -58,7 +58,7 @@ export default function AlignmentTable() {
             {ROWS.map((r) => {
               const cells = r.v[m.key];
               const vals = cells.map(num).filter((x): x is number => x !== null);
-              const best = vals.length > 1 ? Math.min(...vals) : null;
+              const best = vals.length > 0 ? Math.min(...vals) : null;
               return (
                 <tr key={r.t} className="border-b border-zinc-100 last:border-b-2 last:border-zinc-800 dark:border-zinc-800 dark:last:border-zinc-300">
                   <td className="py-1 text-left">{r.t}</td>
